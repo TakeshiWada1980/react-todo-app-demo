@@ -55,5 +55,7 @@ const routes = createRoutesFromElements(
 );
 
 export const Router = createBrowserRouter(routes, {
-  basename: "/react-todo-app-demo",
+  // basename: "/react-todo-app-demo",
+  basename:
+    process.env.NODE_ENV === "production" ? "/react-todo-app-demo/" : "/",
 });
