@@ -1,6 +1,21 @@
+// import {
+//   Route,
+//   createBrowserRouter,
+//   createRoutesFromElements,
+// } from "react-router-dom";
+// import App from "./01/App";
+
+// const routes = createRoutesFromElements(
+//   <>
+//     <Route path="/" element={<App />} />
+//   </>
+// );
+
+// export const Router = createBrowserRouter(routes);
+
 import {
   Route,
-  createBrowserRouter,
+  createHashRouter,
   createRoutesFromElements,
 } from "react-router-dom";
 import App from "./01/App";
@@ -11,7 +26,13 @@ const routes = createRoutesFromElements(
   </>
 );
 
-export const Router = createBrowserRouter(routes);
+const getBasename = () => {
+  if (process.env.NODE_ENV === "production") {
+    return "/react-todo-app-demo";
+  }
+  return "/";
+};
 
-// npm i react-router
-// npm i react-router-dom
+export const Router = createHashRouter(routes, {
+  basename: getBasename(),
+});
