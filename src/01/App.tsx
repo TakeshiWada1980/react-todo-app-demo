@@ -9,6 +9,7 @@ const initTodos: Todo[] = [
   { id: uuid(), title: "Reactの勉強", isDone: false },
   { id: uuid(), title: "TypeScriptの勉強", isDone: true },
   { id: uuid(), title: "基礎物理学3の宿題", isDone: false },
+  { id: uuid(), title: "解析2の宿題", isDone: false },
 ];
 
 function App() {
@@ -91,7 +92,7 @@ function App() {
       <button type="button" onClick={saveData}>
         保存
       </button>
-      <Button>ボタン</Button>
+      <Button>ボタンですが？</Button>
     </div>
   );
 }
