@@ -59,7 +59,7 @@ function App() {
   return (
     <div>
       <div>
-        <h1 className="text-2xl font-bold">MyTodoApp (Demo-01xx)</h1>
+        <h1 className="text-2xl font-bold">MyTodoApp (Demo-02)</h1>
         {todos.map((todo) => (
           <TodoItem key={todo.id} todo={todo} updateTodo={updateTodo} />
         ))}
@@ -92,7 +92,7 @@ function App() {
       <button type="button" onClick={saveData}>
         保存
       </button>
-      <Button>ボタンですが？</Button>
+      <Button>ボタンで</Button>
     </div>
   );
 }

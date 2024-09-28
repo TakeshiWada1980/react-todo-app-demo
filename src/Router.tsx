@@ -42,21 +42,15 @@ import {
   // createHashRouter,
   createRoutesFromElements,
 } from "react-router-dom";
-import App from "./01/App";
-
-// const routes = createRoutesFromElements(<Route path="/" element={<App />} />);
-
-// export const Router = createHashRouter(routes);
-
-// export const Router = createHashRouter(routes, {
-//   basename: "/react-todo-app-demo",
-// });
+import App01 from "./01/App";
+import App02 from "./02/App";
 
 import { createBrowserRouter } from "react-router-dom";
 
 const routes = createRoutesFromElements(
   <>
-    <Route path="/react-todo-app-demo" element={<App />} />
+    <Route path="/" element={<App01 />} />
+    <Route path="/2" element={<App02 />} />
   </>
 );
 
