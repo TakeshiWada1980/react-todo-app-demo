@@ -1,12 +1,13 @@
 import { Todo } from "./types";
 import { twMerge } from "tailwind-merge";
+import dayjs from "dayjs";
 
 type Props = {
   todo: Todo;
   updateTodo: (todo: Todo) => void;
 };
 
-function TodoItem(props: Props) {
+const TodoItem = (props: Props) => {
   const { todo, updateTodo } = props;
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTodo = { ...todo, isDone: e.target.checked };
@@ -14,7 +15,7 @@ function TodoItem(props: Props) {
   };
 
   return (
-    <div className="flex flex-row space-x-2 items-center">
+    <div className="flex flex-row space-x-2 items-baseline">
       <input
         id={todo.id}
         type="checkbox"
@@ -25,10 +26,16 @@ function TodoItem(props: Props) {
         htmlFor={todo.id}
         className={twMerge("", todo.isDone && "line-through")}
       >
-        {todo.title}
+        {todo.name}
       </label>
+      <span className="text-sm text-gray-500">（優先度: {todo.priority}）</span>
+      {todo.deadline && (
+        <span className="text-sm text-gray-500">
+          {dayjs(todo.deadline).format("YYYY/MM/DD HH:mm")}
+        </span>
+      )}
     </div>
   );
-}
+};
 
-export { TodoItem };
+export default TodoItem;

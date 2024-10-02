@@ -1,26 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Todo } from "./types";
-import { TodoItem } from "./TodoItem";
-import { v4 as uuid } from "uuid";
-
-import { Button } from "@/components/ui/button";
-
-const initTodos: Todo[] = [
-  { id: uuid(), title: "Reactの勉強", isDone: false },
-  { id: uuid(), title: "TypeScriptの勉強", isDone: true },
-  { id: uuid(), title: "基礎物理学3の宿題", isDone: false },
-  { id: uuid(), title: "解析2の宿題", isDone: false },
-];
+import TodoItem from "./TodoItem";
+import NewTodoForm from "./NewTodoForm";
+import { initTodos } from "./initTodos";
 
 function App() {
   const localStorageKey = "myTodoApp";
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [newTodoTitle, setNewTodoTitle] = useState("");
 
   useEffect(() => {
     const storedData = localStorage.getItem(localStorageKey);
     if (storedData && storedData !== "[]") {
-      setTodos(JSON.parse(storedData));
+      const data: Todo[] = JSON.parse(storedData);
+      // Todo の deadline が 文字列 になっているので Date に復元
+      const todos: Todo[] = data.map((todo) => ({
+        ...todo,
+        deadline: todo.deadline ? new Date(todo.deadline) : undefined,
+      }));
+      setTodos(todos);
     } else {
       setTodos(initTodos);
     }
@@ -31,24 +28,12 @@ function App() {
     setTodos(updateTodos);
   };
 
-  const saveData = () => {
+  const addTodo = (todo: Todo) => {
+    setTodos([...todos, todo]);
+  };
+
+  const saveTodos = () => {
     localStorage.setItem(localStorageKey, JSON.stringify(todos));
-  };
-
-  const updateNewTodoTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewTodoTitle(e.target.value);
-  };
-
-  const addTodo = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-
-    const newTodo: Todo = {
-      id: uuid(),
-      title: newTodoTitle,
-      isDone: false,
-    };
-    setTodos([...todos, newTodo]);
-    setNewTodoTitle("");
   };
 
   const deleteDoneTodos = () => {
@@ -57,43 +42,39 @@ function App() {
   };
 
   return (
-    <div>
-      <div>
-        <h1 className="text-2xl font-bold">MyTodoApp (Demo-01xx)</h1>
-        {todos.map((todo) => (
-          <TodoItem key={todo.id} todo={todo} updateTodo={updateTodo} />
-        ))}
+    <main className="mx-auto mt-14 w-full max-w-2xl px-5 md:px-0">
+      <div className="mb-6 space-y-2">
+        <h1 className="text-2xl font-bold">TodoApp Demo</h1>
+        <div className="text-sm text-gray-500 ml-2">
+          合格水準ギリギリのサンプル（60点）
+        </div>
       </div>
-      <div className="flex flex-row space-x-2 items-center">
-        <form>
-          <label htmlFor="newTodoTitle">New Todo:</label>
-          <input
-            id="newTodoTitle"
-            type="text"
-            value={newTodoTitle}
-            onChange={updateNewTodoTitle}
-            className="border border-gray-400 rounded-md px-2"
-          />
+      <div className="space-y-4">
+        <div>
+          {todos.map((todo) => (
+            <TodoItem key={todo.id} todo={todo} updateTodo={updateTodo} />
+          ))}
+        </div>
+
+        <div className="space-x-2">
           <button
-            type="submit"
-            onClick={addTodo}
-            className="bg-blue-700 text-sm font-bold rounded-md text-white px-2 py-1"
+            onClick={deleteDoneTodos}
+            className="bg-red-500 text-sm font-bold rounded-md text-white px-2 py-1 hover:bg-red-700"
           >
-            追加
+            完了済みのTodoを削除
           </button>
-        </form>
+          <button
+            type="button"
+            onClick={saveTodos}
+            className="bg-blue-500 text-sm font-bold rounded-md text-white px-2 py-1 hover:bg-blue-700"
+          >
+            保存
+          </button>
+        </div>
+
+        <NewTodoForm addTodo={addTodo} />
       </div>
-      <button
-        onClick={deleteDoneTodos}
-        className="bg-red-700 text-sm font-bold rounded-md text-white px-2 py-1"
-      >
-        完了したTodoを削除
-      </button>
-      <button type="button" onClick={saveData}>
-        保存
-      </button>
-      <Button>ボタンですが？</Button>
-    </div>
+    </main>
   );
 }
 

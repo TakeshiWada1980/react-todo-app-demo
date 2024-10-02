@@ -1,99 +1,161 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Todo } from "./types";
-import { TodoItem } from "./TodoItem";
-import { v4 as uuid } from "uuid";
-
+import TodoItem from "./TodoItem";
+import EditTodoDialog from "./EditTodoDialog";
+import { initTodos, initTodoValue } from "./initTodos";
 import { Button } from "@/components/ui/button";
-
-const initTodos: Todo[] = [
-  { id: uuid(), title: "Reactの勉強", isDone: false },
-  { id: uuid(), title: "TypeScriptの勉強", isDone: true },
-  { id: uuid(), title: "基礎物理学3の宿題", isDone: false },
-  { id: uuid(), title: "解析2の宿題", isDone: false },
-];
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowRightToBracket,
+  faArrowDownWideShort,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 
 function App() {
   const localStorageKey = "myTodoApp";
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [newTodoTitle, setNewTodoTitle] = useState("");
+  const [todoEditInitValue, setTodoEditInitValue] =
+    useState<Todo>(initTodoValue);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     const storedData = localStorage.getItem(localStorageKey);
     if (storedData && storedData !== "[]") {
-      setTodos(JSON.parse(storedData));
+      const data: Todo[] = JSON.parse(storedData);
+      // Todo の deadline が 文字列 になっているので Date に復元
+      const todos: Todo[] = data.map((todo) => ({
+        ...todo,
+        deadline: todo.deadline ? new Date(todo.deadline) : undefined,
+      }));
+      setTodos(todos);
     } else {
       setTodos(initTodos);
     }
   }, []);
 
-  const updateTodo = (todo: Todo) => {
-    const updateTodos = todos.map((t) => (t.id === todo.id ? todo : t));
-    setTodos(updateTodos);
-  };
-
-  const saveData = () => {
+  const saveTodos = (todos: Todo[]) => {
     localStorage.setItem(localStorageKey, JSON.stringify(todos));
   };
-
-  const updateNewTodoTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewTodoTitle(e.target.value);
+  const updateTodo = (todo: Todo) => {
+    const updatedTodos = todos.map((t) => (t.id === todo.id ? todo : t));
+    setTodos(updatedTodos);
+    saveTodos(updatedTodos);
   };
 
-  const addTodo = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const addTodo = (todo: Todo) => {
+    const updatedTodos = [...todos, todo];
+    setTodos(updatedTodos);
+    saveTodos(updatedTodos);
+  };
 
-    const newTodo: Todo = {
-      id: uuid(),
-      title: newTodoTitle,
-      isDone: false,
-    };
-    setTodos([...todos, newTodo]);
-    setNewTodoTitle("");
+  const deleteTodo = (id: string) => {
+    const updatedTodos = todos.filter((t) => t.id !== id);
+    setTodos(updatedTodos);
+    saveTodos(updatedTodos);
   };
 
   const deleteDoneTodos = () => {
-    const updateTodos = todos.filter((todo) => !todo.isDone);
+    const updatedTodos = todos.filter((todo) => !todo.isDone);
+    setTodos(updatedTodos);
+    saveTodos(updatedTodos);
+  };
+
+  const openDialogNewTodoMode = () => {
+    setTodoEditInitValue(initTodoValue);
+    setIsDialogOpen(true);
+  };
+
+  const openDialogEditTodoMode = (todo: Todo) => {
+    setTodoEditInitValue(todo);
+    setIsDialogOpen(true);
+  };
+
+  const sortTodosByDeadline = () => {
+    const updateTodos = [...todos].sort((a, b) => {
+      if (a.deadline && b.deadline) {
+        return a.deadline.getTime() - b.deadline.getTime();
+      }
+      if (a.deadline) {
+        return -1;
+      }
+      if (b.deadline) {
+        return 1;
+      }
+      return 0;
+    });
+    setTodos(updateTodos);
+  };
+
+  const sortTodosByPriority = () => {
+    const updateTodos = [...todos].sort((a, b) => a.priority - b.priority);
     setTodos(updateTodos);
   };
 
   return (
-    <div>
-      <div>
-        <h1 className="text-2xl font-bold">MyTodoApp (Demo-02)</h1>
-        {todos.map((todo) => (
-          <TodoItem key={todo.id} todo={todo} updateTodo={updateTodo} />
-        ))}
+    <main className="mx-auto mt-14 w-full max-w-xl px-5 md:px-0">
+      <div className="mb-6 space-y-2 flex justify-between ">
+        <div>
+          <h1 className="text-2xl font-bold">TodoApp Demo</h1>
+          <div className="text-sm text-gray-500 ml-2">
+            最高水準のサンプル（90点）
+          </div>
+        </div>
+        <div>
+          <Button onClick={openDialogNewTodoMode} className="h-auto py-1.5">
+            <FontAwesomeIcon icon={faArrowRightToBracket} className="mr-2" />
+            <div>Todoの追加</div>
+          </Button>
+        </div>
       </div>
-      <div className="flex flex-row space-x-2 items-center">
-        <form>
-          <label htmlFor="newTodoTitle">New Todo:</label>
-          <input
-            id="newTodoTitle"
-            type="text"
-            value={newTodoTitle}
-            onChange={updateNewTodoTitle}
-            className="border border-gray-400 rounded-md px-2"
-          />
-          <button
-            type="submit"
-            onClick={addTodo}
-            className="bg-blue-700 text-sm font-bold rounded-md text-white px-2 py-1"
-          >
-            追加
-          </button>
-        </form>
+
+      <div className="mb-6 flex justify-items-center space-x-2">
+        <Button
+          onClick={sortTodosByDeadline}
+          variant="secondary"
+          className="h-auto py-1.5"
+        >
+          <FontAwesomeIcon icon={faArrowDownWideShort} className="mr-2" />
+          <div>期日でソート</div>
+        </Button>
+        <Button
+          onClick={sortTodosByPriority}
+          variant="secondary"
+          className="h-auto py-1.5"
+        >
+          <FontAwesomeIcon icon={faArrowDownWideShort} className="mr-2" />
+          <div>優先度でソート</div>
+        </Button>
       </div>
-      <button
-        onClick={deleteDoneTodos}
-        className="bg-red-700 text-sm font-bold rounded-md text-white px-2 py-1"
-      >
-        完了したTodoを削除
-      </button>
-      <button type="button" onClick={saveData}>
-        保存
-      </button>
-      <Button>ボタンで</Button>
-    </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          {todos.map((todo) => (
+            <TodoItem
+              key={todo.id}
+              todo={todo}
+              editTodo={openDialogEditTodoMode}
+              updateTodo={updateTodo}
+            />
+          ))}
+        </div>
+
+        <div className="space-x-2">
+          <Button onClick={deleteDoneTodos} className="h-auto py-1.5">
+            <FontAwesomeIcon icon={faTrash} className="mr-2" />
+            <div>完了済みのTodoを削除</div>
+          </Button>
+        </div>
+
+        <EditTodoDialog
+          addTodo={addTodo}
+          deleteTodo={deleteTodo}
+          updateTodo={updateTodo}
+          initValue={todoEditInitValue}
+          isOpen={isDialogOpen}
+          setIsOpen={setIsDialogOpen}
+        />
+      </div>
+    </main>
   );
 }
 
