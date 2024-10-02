@@ -11,7 +11,7 @@ const NewTodoForm = (props: Props) => {
   const { addTodo } = props;
   const [name, setName] = useState("");
   const [priority, setPriority] = useState(3);
-  const [deadline, setDeadline] = useState<Date | null>(null);
+  const [deadline, setDeadline] = useState<Date | undefined>(undefined);
 
   const onSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -25,7 +25,7 @@ const NewTodoForm = (props: Props) => {
     addTodo(newTodo);
     setName("");
     setPriority(3);
-    setDeadline(null);
+    setDeadline(undefined);
   };
 
   const updateName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +38,7 @@ const NewTodoForm = (props: Props) => {
 
   const updateDeadline = (e: React.ChangeEvent<HTMLInputElement>) => {
     const dateTime = e.target.value;
-    setDeadline(dateTime ? new Date(dateTime) : null);
+    setDeadline(dateTime ? new Date(dateTime) : undefined);
   };
 
   return (

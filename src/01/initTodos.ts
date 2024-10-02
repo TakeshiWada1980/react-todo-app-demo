@@ -7,14 +7,14 @@ export const initTodos: Todo[] = [
     name: "Reactの勉強 (予習)",
     isDone: false,
     priority: 3,
-    deadline: null,
+    deadline: undefined,
   },
   {
     id: uuid(),
     name: "TypeScriptの勉強 (復習)",
     isDone: true,
     priority: 2,
-    deadline: null,
+    deadline: undefined,
   },
   {
     id: uuid(),
