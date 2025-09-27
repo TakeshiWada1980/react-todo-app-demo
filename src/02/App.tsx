@@ -97,7 +97,7 @@ function App() {
         <div>
           <h1 className="text-2xl font-bold">TodoApp Demo</h1>
           <div className="text-sm text-gray-500 ml-2">
-            最高水準のサンプル（90点）
+            高水準のサンプル（90点）
           </div>
         </div>
         <div>

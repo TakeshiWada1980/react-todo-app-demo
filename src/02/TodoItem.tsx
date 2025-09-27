@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenNib, faSkull } from "@fortawesome/free-solid-svg-icons";
 import Star from "./Star";
+import party from "party-js";
 
 type Props = {
   todo: Todo;
@@ -42,15 +43,26 @@ const TodoItem = (props: Props) => {
             id={todo.id}
             checked={todo.isDone}
             onCheckedChange={handleIsDoneChange}
+            onMouseDown={() => {
+              if (!todo.isDone) {
+                party.confetti(document.getElementById(`${todo.id}`)!);
+              }
+            }}
           />
         </div>
 
         <div className="flex-col">
-          <div>
+          <div
+            onMouseDown={() => {
+              if (!todo.isDone) {
+                party.confetti(document.getElementById(`${todo.id}`)!);
+              }
+            }}
+          >
             <label
               htmlFor={todo.id}
               className={twMerge(
-                "group-hover:font-bold",
+                "group-hover:font-bold group-hover:cursor-pointer",
                 todo.isDone && "line-through text-gray-500"
               )}
             >
